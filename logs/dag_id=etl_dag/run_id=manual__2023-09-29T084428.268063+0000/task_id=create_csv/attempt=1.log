@@ -1,0 +1,15 @@
+[2023-09-29T08:44:29.550+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_dag.create_csv manual__2023-09-29T08:44:28.268063+00:00 [queued]>
+[2023-09-29T08:44:29.557+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_dag.create_csv manual__2023-09-29T08:44:28.268063+00:00 [queued]>
+[2023-09-29T08:44:29.557+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 2
+[2023-09-29T08:44:29.568+0000] {taskinstance.py:1380} INFO - Executing <Task(_PythonDecoratedOperator): create_csv> on 2023-09-29 08:44:28.268063+00:00
+[2023-09-29T08:44:29.574+0000] {standard_task_runner.py:57} INFO - Started process 1690 to run task
+[2023-09-29T08:44:29.577+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'etl_dag', 'create_csv', 'manual__2023-09-29T08:44:28.268063+00:00', '--job-id', '699', '--raw', '--subdir', 'DAGS_FOLDER/etl_dag.py', '--cfg-path', '/tmp/tmpuet5ntlp']
+[2023-09-29T08:44:29.580+0000] {standard_task_runner.py:85} INFO - Job 699: Subtask create_csv
+[2023-09-29T08:44:29.616+0000] {task_command.py:415} INFO - Running <TaskInstance: etl_dag.create_csv manual__2023-09-29T08:44:28.268063+00:00 [running]> on host 952459b89771
+[2023-09-29T08:44:29.679+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='etl_dag' AIRFLOW_CTX_TASK_ID='create_csv' AIRFLOW_CTX_EXECUTION_DATE='2023-09-29T08:44:28.268063+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2023-09-29T08:44:28.268063+00:00'
+[2023-09-29T08:44:29.681+0000] {logging_mixin.py:151} INFO - creating csv file
+[2023-09-29T08:44:29.681+0000] {logging_mixin.py:151} INFO - 'exclusive' is an invalid keyword argument for open()
+[2023-09-29T08:44:29.682+0000] {python.py:194} INFO - Done. Returned value was: True
+[2023-09-29T08:44:29.699+0000] {taskinstance.py:1398} INFO - Marking task as SUCCESS. dag_id=etl_dag, task_id=create_csv, execution_date=20230929T084428, start_date=20230929T084429, end_date=20230929T084429
+[2023-09-29T08:44:29.749+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 0
+[2023-09-29T08:44:29.762+0000] {taskinstance.py:2776} INFO - 0 downstream tasks scheduled from follow-on schedule check
