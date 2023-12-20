@@ -1,5 +1,1 @@
 .env
-logs/*
-data/*
-config/*
-dags/__pycache__
