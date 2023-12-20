@@ -7,13 +7,30 @@ import xml.etree.ElementTree as ET
 from airflow.models import TaskInstance
 import oracledb
 import csv
+import os
+from dotenv import load_dotenv
+import requests
+import urllib3
+import smtplib
+from email.message import EmailMessage
+import ssl
 
 with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once", default_args= {"retries": 1}) as dag:
 
+    # --------------------------------------------------------------------------------------------------------------------------
     # -------------------------------------------SHOULD-BE-IN-MODULE-FOLDER-----------------------------------------------------
+    # --------------------------------------------------------------------------------------------------------------------------
+    
     # connect to oracle database tables
     def check_connect_to_db(**kwargs):
-        conn = oracledb.connect(user="c##john", password="abcd1234", dsn="host.docker.internal:1521/orcl")
+        load_dotenv()
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+        db_dns = os.getenv("DB_DNS")
+
+        print(db_user, db_password, db_dns)
+        conn = oracledb.connect(user=db_user, password=db_password, dsn=db_dns)
+
         print(conn.version)
         cursor = conn.cursor()
         try:
@@ -42,7 +59,7 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
     # create csv file for storing data
     def create_csv_file(**kwargs):
         # create csv file
-        import os
+        
         print("creating csv file")
         csv_file = ".\data\demo_xml.csv"
 
@@ -68,8 +85,7 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
     
     # get data from api and load to csv file
     def extract_to_csv(**kwargs):
-        import requests
-        import urllib3
+
         print("extracting data from api")
         api = "http://restapi.adequateshop.com/api/Traveler" 
         page = 1
@@ -144,9 +160,12 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
     # Load records in csv file into oracle db using bulk insert
     def load_to_db(**kwargs):
         # connect to oracle database tables
-        import pandas as pd
-        
-        conn = oracledb.connect(user="c##john", password="abcd1234", dsn="host.docker.internal:1521/orcl")
+        load_dotenv()
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+        db_dns = os.getenv("DB_DNS")
+
+        conn = oracledb.connect(user=db_user, password=db_password, dsn=db_dns)
         print(conn.version)
         cursor = conn.cursor()
         csv_path = ".\data\demo_xml.csv"
@@ -183,7 +202,7 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
     
     # Delete the csv file after loading to db
     def delete_csv_file(**kwargs):
-        import os
+        
         csv_path = ".\data\demo_xml.csv"
         try:
             os.remove(csv_path)
@@ -196,11 +215,13 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
     
     # Send email after ETL process completed
     def send_email(**kwargs):
-        print("sending email")
-        import smtplib
-        from email.message import EmailMessage
-        import ssl
 
+        load_dotenv()
+        email_sender = os.getenv("EMAIL_SENDER")
+        email_password = os.getenv("EMAIL_PASSWORD")
+        email_receiver = os.getenv("EMAIL_RECEIVER")
+
+        print("sending email")
         task1 = kwargs['ti'].xcom_pull(key='check_connect_to_db', task_ids='check_connect_to_db')
         task2 = kwargs['ti'].xcom_pull(key='create_csv_file', task_ids='create_csv_file')
         task3 = kwargs['ti'].xcom_pull(key='extract_to_csv', task_ids='extract_to_csv')
@@ -217,14 +238,14 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
         
         if task1 == "success" and task2 == "success" and task3 == "success" and task4 == "success" and task5 == "success":
             em['Subject'] = "ETL process completed at " + str(datetime.now())
-            em['From'] = "ngh95411@gmail.com"
-            em['To'] = "nghianm1508@gmail.com"
+            em['From'] = email_sender
+            em['To'] = email_receiver
             em.set_content("All tasks completed successfully" + "\n" + "ETL process completed at " + str(datetime.now())
                         + "\n" + "Regards," + "\n" + "PIPELINE" + "\n")
         else:
             em['Subject'] = "ETL process failed at " + str(datetime.now())
-            em['From'] = "ngh95411@gmail.com"
-            em['To'] = "nghianm1508@gmail.com"
+            em['From'] = email_sender
+            em['To'] = email_receiver
             em.set_content("Some tasks failed" + "\n" + "ETL process failed at " + str(datetime.now())
                         + "\n" + "Task 1: " + task1 + "\n" + "Task 2: " + task2 + "\n" + "Task 3: " + task3 
                         + "\n" + "Task 4: " + task4 + "\n" + "Task 5: " + task5
@@ -233,11 +254,13 @@ with DAG(dag_id="etl_sql_dag", start_date=datetime(2022, 1, 1), schedule="@once"
         
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
-            server.login("ngh95411@gmail.com", "mfjw ypfp skja neod")
+            server.login(email_sender, email_password)
             server.send_message(em)
         return True
+    
+    # --------------------------------------------------------------------------------------------------------------------------
     # -------------------------------------------SHOULD-BE-IN-MODULE-FOLDER-----------------------------------------------------
-
+    # --------------------------------------------------------------------------------------------------------------------------
 
     # task operators
     # xcom: cross communication between tasks, can pass a small amount of data between tasks

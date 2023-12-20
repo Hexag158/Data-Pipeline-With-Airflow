@@ -10,13 +10,13 @@ import  requests
 with DAG(dag_id="etl_dag", start_date=datetime(2022, 1, 1), schedule="@once", default_args=
          {"retries": 1}) as dag:
 
-    # Cannot dirrectly create file in local because airflow is running on a virtual environment
+    # Could not dirrectly create file in local because airflow is running on a virtual environment
     # Cannot find the file inside the virtual environment
 
     # @task()
     # def create_csv():
     #     print("creating csv file")
-    #     csv_file = "D:\Intern_VNPT\sep_21\dags\data\demo_xml.csv"
+    #     csv_file = ""
     #     try:
     #         with open(csv_file, 'w', newline='') as file:
     #             writer = csv.writer(file)
@@ -29,7 +29,7 @@ with DAG(dag_id="etl_dag", start_date=datetime(2022, 1, 1), schedule="@once", de
 
     @task()
     def ETL():
-        csv_file = "D:\Intern_VNPT\sep_21\dags\data\demo_xml.csv"
+        csv_file = ".\dags\data\demo_xml.csv"
         print("transforming data")
         #date_time = datetime.today().strftime('%d-%b-%y-%H-%M-%S')
         api = "http://restapi.adequateshop.com/api/Traveler"
