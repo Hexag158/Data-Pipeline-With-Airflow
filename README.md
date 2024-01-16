@@ -3,7 +3,7 @@
 The other day, I woke up and decided to learn Apache Airflow to add up my tech skills, so that's why this repo is here.
 
 ## Overview
-This repo is a data pipeline I built to extract the data from a dummy API that I found randomly on the Internet, save them into a CSV file, load them into a local Oracle Database, and then email me when everything is done or when there are errors during the ETL process.
+This repo is a data pipeline I built to extract the data from a dummy API that I found randomly on the Internet, save them into a CSV file, load them into a local Oracle Database, and then email me when everything is done or when there are errors during the ETL process. The process can be scheduled to run every day by setting the DAG schedule parameter.
 
 ### docker-compose.yaml - Install Airflow
 You have to install Docker then go to the terminal and run this line, it will create everything including image, containers and volumes we need to run the Airflow:
